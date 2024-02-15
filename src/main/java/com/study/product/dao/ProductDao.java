@@ -4,6 +4,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.study.product.config.DBConnectionMgr;
 import com.study.product.vo.ProductVo;
@@ -21,6 +23,38 @@ public class ProductDao {
 			instance = new ProductDao();
 		}
 		return instance;
+	}
+	
+	public List<ProductVo> getProductList() {
+		List<ProductVo> list = new ArrayList<>();
+		Connection con = null;
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		
+		try {
+			con = pool.getConnection();
+			String sql = "select * from product_tb";
+			pstmt = con.prepareStatement(sql);
+			rs = pstmt.executeQuery();
+			
+			while(rs.next()) {
+				ProductVo productVo = ProductVo.builder()
+						.productId(rs.getInt(1))
+						.productName(rs.getString(2))
+						.productPrice(rs.getInt(3))
+						.productSize(rs.getString(4))
+						.build();
+				
+				list.add(productVo);
+			}
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			pool.freeConnection(con, pstmt, rs);
+		}
+		
+		return list;
 	}
 	
 	public ProductVo findProductByProductName(String productName) {
@@ -78,7 +112,7 @@ public class ProductDao {
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
-			pool.freeConnection(con, pstmt);
+			pool.freeConnection(con, pstmt, rs);
 		}
 		
 		return successCount;
