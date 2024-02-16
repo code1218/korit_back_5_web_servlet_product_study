@@ -32,7 +32,10 @@ public class CommonFilter extends HttpFilter implements Filter {
 	}
 
 
-	public void init(FilterConfig fConfig) throws ServletException {}
+	public void init(FilterConfig fConfig) throws ServletException {
+		fConfig.getServletContext();
+		
+	}
 
 }
 
